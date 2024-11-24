@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>防伪查询</title>
+    <link href="/static/css/app.e49f8bf5a3fda436a466cdad03a7c4ea.css" rel="stylesheet">
+    <style type="text/css">
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #f0f0f0;
+        }
+        .imgBox {
+            border-top: 2px solid cadetblue;
+            width: 100%;
+            height: 250px;
+            margin: 0 auto;
+        }
+        .imgBox img {
+            width: 100%;
+            height: 250px;
+            margin: 0 auto;
+            padding-top: 30px;
+        }
+        .img2, .img3, .img4, .img5, .img6, .img7 {
+            display: none;
+        }
+        .fangdajing {
+            width: 5%; /* 或者具体像素值，例如 300px */
+            height: auto;
+            margin-top: 30px;
+        }
+        .fangdajing2 {
+            width: 15%; /* 或者具体像素值，例如 300px */
+            height: auto;
+        }
+        .figure-container {
+            position: relative;
+            height: 200px; /* 固定高度 */
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .figure {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            height: 150px;
+            width: 150px;
+            background-color: #60B5FE;
+            position: relative; /* 移除绝对定位 */
+            overflow: hidden; /* 防止文本溢出 */
+        }
+        .figure-text {
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+        .strong-color {
+            color: #019901;
+        }
+
+        footer {
+            background-color: #f0f0f0;
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        footer div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50%;
+        }
+        footer img {
+            margin-bottom: 10px;
+        }
+
+        /* 单个按钮容器的样式 */
+        .footer-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        /* 按钮内的图片样式 */
+        .footer-button button img {
+            width: 25px; /* 调整图像的宽度以适应设计需求 */
+            height: auto;
+            margin-bottom: 10px; /* 添加一点下边距以分隔图像和按钮 */
+        }
+
+        /* 按钮内的文字样式 */
+        .footer-button button span {
+            display: block; /* 使文字占据整个按钮的宽度 */
+        }
+        /* 按钮的样式 */
+        .footer-button button {
+            width: 100%; /* 确保按钮填充其父容器的宽度 */
+            padding: 10px 0;
+            background-color: #ffffff;
+            color: #333333;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        footer button:hover {
+            background-color:  #0056b3;
+        }
+        iframe[src*="api.map.baidu.com/res/staticPages/location.html"] {
+            display: none;
+        }
+
+        body {
+            background: #fff;
+        }
+
+        .container.comp-scancode .item-input,
+        .item-header input {
+            color: black;
+        }</style>
+        <script type="text/javascript" async=""
+        src="https://turing.captcha.gtimg.com/1/tcaptcha-frame.7cfc3d42.js"></script>
+        <style type="text/css">@keyframes animate_dots {
+                                   0% {
+                                       opacity: 1
+                                   }
+                                   to {
+                                       opacity: 0
+                                   }
+                               }
+
+        @-webkit-keyframes animate_dots {
+            0% {
+                opacity: 1
+            }
+            to {
+                opacity: 0
+            }
+        }
+
+        .dot0, .dot1 {
+            animation: animate_dots .9s infinite;
+            -moz-animation: animate_dots .9s infinite;
+            -webkit-animation: animate_dots .9s infinite;
+            -o-animation: animate_dots .9s infinite
+        }
+
+        .dot1 {
+            animation-delay: .2s;
+            -webkit-animation-delay: .2s
+        }
+
+        .dot2 {
+            animation: animate_dots .9s infinite;
+            -moz-animation: animate_dots .9s infinite;
+            -webkit-animation: animate_dots .9s infinite;
+            -o-animation: animate_dots .9s infinite;
+            animation-delay: .4s;
+            -webkit-animation-delay: .4s
+        }
+
+        .dots_item {
+            display: inline-block;
+            margin-right: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4886ff
+        }
+
+        .verify-icon {
+            position: absolute;
+            width: 100%;
+            margin-top: 70px;
+            text-align: center
+        }
+
+        .t-embed-loading {
+            position: relative;
+            width: 300px;
+            height: 230px;
+            background-color: #fff
+        }
+
+        .t-embed-dots {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -22.5px;
+            margin-top: -5px
+        }
+
+        .t-embed-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+            background: #4886ff
+        }
+
+        .t-mask {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            _position: absolute;
+            left: 0;
+            top: 0;
+            background: #000;
+            opacity: .5;
+            filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+            z-index: 2000000000
+        }</style>
+        <script charset="utf8" src="https://dlswbr.baidu.com/heicha/mw/abclite-2063-s.original.js?_=10025"></script>
+        <style>@font-face {
+            font-family: 'nc-iconfont';
+            src: url('//at.alicdn.com/t/font_skgl4wg07pgv6lxr.eot');
+            src: url('//at.alicdn.com/t/font_skgl4wg07pgv6lxr.eot?#iefix') format('embedded-opentype'), url('//at.alicdn.com/t/font_skgl4wg07pgv6lxr.woff') format('woff'), url('//at.alicdn.com/t/font_skgl4wg07pgv6lxr.ttf') format('truetype'), url('//at.alicdn.com/t/font_skgl4wg07pgv6lxr.svg#iconfont') format('svg')
+        }
+
+        .nc-iconfont {
+            font-family: "nc-iconfont" !important;
+            font-size: 16px;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-stroke-width: .2px;
+            -moz-osx-font-smoothing: grayscale
+        }
+
+        ._nc .icon-close:before {
+            content: "\e601"
+        }
+
+        ._nc .icon-notclick:before {
+            content: "\e60a"
+        }
+
+        ._nc .icon-left-triangle:before {
+            content: "\e60c"
+        }
+
+        ._nc .icon-checkbox:before {
+            content: "\e602"
+        }
+
+        ._nc .icon-message:before {
+            content: "\e603"
+        }
+
+        ._nc .icon-onclick:before {
+            content: "\e60b"
+        }
+
+        ._nc .icon-refresh:before {
+            content: "\e604"
+        }
+
+        ._nc .icon-list-check:before {
+            content: "\e605"
+        }
+
+        ._nc .icon-warn:before {
+            content: "\e600"
+        }
+
+        ._nc .icon-ok:before {
+            content: "\e606"
+        }
+
+        ._nc .icon-slide-arrow:before {
+            content: "\e607"
+        }
+
+        ._nc .icon-load-c:before {
+            content: "\e608"
+        }
+
+        ._nc .icon-close-white:before {
+            content: "\e609"
+        }
+
+        ._nc .icon-info:before {
+            content: "\e60d"
+        }
+
+        ._nc {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            font-size: 16px
+        }
+
+        ._nc * {
+            padding: 0;
+            margin: 0;
+            border: none
+        }
+
+        ._nc .icon {
+            line-height: normal;
+            width: 30px;
+            height: 30px
+        }
+
+        ._nc .icon-slide-arrow {
+            font-size: 30px;
+            color: #dbdbdb
+        }
+
+        ._nc .icon-ok {
+            font-size: 30px;
+            color: #7ac23c
+        }
+
+        ._nc .icon-close {
+            font-size: 30px;
+            color: #fc5620
+        }
+
+        ._nc .icon-load-c {
+            font-size: 30px;
+            color: #7ac23c;
+            padding-top: 2px
+        }
+
+        ._nc .icon-onclick {
+            font-size: 30px;
+            color: #dddddd
+        }
+
+        ._nc .icon-notclick {
+            font-size: 30px;
+            color: #dddddd
+        }
+
+        ._nc .icon-left-triangle {
+            color: #dddddd
+        }
+
+        ._nc .stage {
+            position: relative;
+            padding: 0 15px
+        }
+
+        ._nc .stage1 {
+            height: 55px;
+            position: relative
+        }
+
+        ._nc .stage1 .bg-green {
+            background-color: #78c430
+        }
+
+        ._nc .stage1 .bg-red {
+            background-color: #ff5500
+        }
+
+        ._nc .stage1 .slider {
+            position: absolute;
+            height: 52px;
+            box-shadow: 0 0 3px #999;
+            background-color: #ddd;
+            left: 15px;
+            right: 15px
+        }
+
+        ._nc .stage1 .label {
+            display: block;
+            width: 100%;
+            color: #aaa
+        }
+
+        ._nc .stage1 .track.mv-back {
+            -webkit-transition: width .5s
+        }
+
+        ._nc .stage1 .button.mv-back {
+            -webkit-transition: left .5s
+        }
+
+        ._nc .stage1 .track {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            overflow: hidden
+        }
+
+        ._nc .stage1 .track div {
+            color: #fff
+        }
+
+        ._nc .stage1 .track div, ._nc .stage1 .label {
+            line-height: 52px;
+            height: 52px;
+            text-align: center;
+            font-size: 16px
+        }
+
+        ._nc .stage1 .button {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 52px;
+            height: 52px;
+            background-color: #fff;
+            cursor: pointer
+        }
+
+        ._nc .stage1 .icon {
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            margin: auto
+        }
+
+        ._nc .stage1 .icon.nc-loading {
+            -webkit-animation: _nc_rotate 1s linear infinite
+        }
+
+        ._nc .stage1 .icon.yes {
+            background-position: -60px 0
+        }
+
+        ._nc .stage1 .icon.no {
+            background-position: -90px 0
+        }
+
+        @media only screen and (min-device-width: 320px) and (max-device-height: 568px) and (-webkit-device-pixel-ratio: 2) {
+            ._nc .stage1 .icon {
+                bottom: 14px
+            }
+        }
+
+        @-webkit-keyframes _nc_rotate {
+            from {
+                -webkit-transform: rotate(0deg)
+            }
+            to {
+                -webkit-transform: rotate(360deg)
+            }
+        }
+
+        ._nc .stage1 .click2slider {
+            box-shadow: 0 0 3px #999;
+            position: relative;
+            border-radius: 4px;
+            box-sizing: border-box;
+            height: 55px
+        }
+
+        ._nc .stage1 .click2slider .click2slide-btn {
+            width: 52px;
+            height: 52px;
+            position: absolute
+        }
+
+        ._nc .stage1 .click2slider .click2slider-label {
+            width: 100%;
+            line-height: 52px;
+            height: 52px;
+            text-align: center;
+            font-size: 16px;
+            color: #aeaeae
+        }
+
+        ._nc .stage1 .click2slider .click2slider-label .nc-iconfont.icon-left-triangle {
+            position: relative;
+            left: -10px
+        }
+
+        ._nc .stage1 .click2slider .slider-holder {
+            position: relative;
+            width: auto;
+            height: 52px;
+            margin-left: 40px
+        }
+
+        ._nc .stage1 .click2slider .slider-holder .slider, ._nc .stage1 .click2slider .slider-holder .button, ._nc .stage1 .click2slider .slider-holder .label {
+            height: 43px
+        }
+
+        ._nc .stage1 .click2slider .slider-holder .slider {
+            top: 0;
+            bottom: 0;
+            margin: auto
+        }
+
+        ._nc .stage1 .click2slider .slider-holder .slider .track.moving {
+            -moz-transition: .5s ease-out;
+            -webkit-transition: .5s ease-out;
+            -o-transition: .5s ease-out;
+            transition: .5s ease-out
+        }
+
+        ._nc .stage1 .click2slider .slider-holder .slider .button.moving {
+            -moz-transition: .5s ease-out;
+            -webkit-transition: .5s ease-out;
+            -o-transition: .5s ease-out;
+            transition: .5s ease-out
+        }
+
+        ._nc .stage1 .click2slider .slider-holder .button {
+            width: 43px
+        }
+
+        ._nc .stage1 .click2slider .slider-holder .button .icon {
+            left: 6px
+        }
+
+        ._nc .stage1 .click2slider .slider-holder .label {
+            line-height: 43px
+        }
+
+        ._nc .stage1 .click2slider .slider-holder .bg-green, ._nc .stage1 .click2slider .slider-holder .bg-red {
+            line-height: 43px;
+            height: 43px
+        }
+
+        ._nc .stage2 .textbox {
+            width: 100%;
+            height: 52px;
+            position: relative;
+            background-color: #fff;
+            border-radius: 6px;
+            border: 1px solid #bbb
+        }
+
+        ._nc .stage2 .textbox .input {
+            position: absolute;
+            left: 50px;
+            top: 6px;
+            background: none;
+            width: 140px;
+            height: 40px;
+            outline: none;
+            font-size: 18px;
+            color: #333
+        }
+
+        ._nc .stage2 .textbox .placeholder {
+            position: absolute;
+            -webkit-user-select: none;
+            pointer-events: none;
+            left: 52px;
+            top: 14px;
+            font-size: 18px;
+            color: #ccc
+        }
+
+        ._nc .stage2 .textbox .code {
+            position: absolute;
+            right: 50px;
+            top: 12px;
+            border-left: 2px solid #ccc
+        }
+
+        ._nc .stage2 .icon {
+            top: 0;
+            position: absolute;
+            top: 11px;
+            font-size: 30px;
+            color: #999
+        }
+
+        ._nc .stage2 .icon.tip {
+            left: 10px
+        }
+
+        ._nc .stage2 .icon.clear {
+            display: none;
+            left: 122px
+        }
+
+        ._nc .stage2 .icon.refresh {
+            right: 11px
+        }
+
+        @media only screen and (min-device-width: 320px) and (max-device-height: 568px) and (-webkit-device-pixel-ratio: 2) {
+            ._nc .stage2 .icon {
+                top: 4px
+            }
+        }
+
+        ._nc .stage2 .btn-ok, ._nc .stage2 .tips {
+            width: 100%;
+            height: 46px;
+            margin-top: 18px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 20px;
+            border: none;
+            outline: none;
+            background-color: #3199f4
+        }
+
+        ._nc .stage2 .btn-ok:disabled {
+            background-color: #ccc
+        }
+
+        ._nc .stage2 .tips {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            line-height: 46px;
+            display: none
+        }
+
+        ._nc .stage3 {
+            height: 150px
+        }
+
+        ._nc .stage3 .title {
+            font-size: 20px;
+            color: #777;
+            width: 100%;
+            text-align: center;
+            margin: 40px 0 20px 0
+        }
+
+        ._nc .stage3 .menu {
+            position: absolute;
+            width: 50%;
+            text-align: center
+        }
+
+        ._nc .stage3 .menu * {
+            display: inline-block
+        }
+
+        ._nc .stage3 .menu .label {
+            position: relative;
+            font-size: 16px;
+            height: 32px;
+            line-height: 32px;
+            color: #666;
+            top: -8px
+        }
+
+        ._nc .stage3 .menu .icon {
+            margin-right: 10px;
+            font-size: 30px;
+            color: #999
+        }
+
+        ._nc .stage3 .menu.refresh .icon {
+            background-position: -120px 0
+        }
+
+        ._nc .stage3 .menu.feedback {
+            right: 0
+        }
+
+        ._nc .stage3 .menu.feedback .icon {
+            background-position: -150px 0
+        }
+
+        ._nc .stage3 .menu.nc-sep {
+            outline: 1px solid #ccc;
+            width: 0;
+            height: 32px;
+            left: 50%
+        }
+
+        ._nc .stage1 .label {
+            background: -webkit-gradient(linear, left top, right top, color-stop(0, #4d4d4d), color-stop(.4, #4d4d4d), color-stop(.5, white), color-stop(.6, #4d4d4d), color-stop(1, #4d4d4d));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-animation: slidetounlock 3s infinite;
+            -webkit-text-size-adjust: none
+        }
+
+        ._nc .stage1 .label.no-anim {
+            background: none;
+            -webkit-background-clip: inherit;
+            -webkit-text-fill-color: inherit;
+            -webkit-animation: none
+        }
+
+        ._nc .nc-hidden {
+            display: none
+        }
+
+        @-webkit-keyframes slidetounlock {
+            0% {
+                background-position: -200px 0
+            }
+            100% {
+                background-position: 200px 0
+            }
+        }
+
+        .nc-h5-overlay {
+            position: fixed;
+            z-index: 100000;
+            display: none;
+            background: #f0f0f0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            font-size: 16px
+        }
+
+        .nc-h5-overlay div.info {
+            display: block;
+            padding: 15px 10px;
+            line-height: 1.2em
+        }
+
+        .nc-h5-overlay div.info i.nc-iconfont {
+            color: #f00;
+            width: 1.2em;
+            font-size: 120%;
+            margin-right: .3em
+        }
+
+        ._nc.nc-h5-overlay .stage2.stage {
+            padding: 0
+        }
+
+        ._nc.nc-h5-overlay .stage2.stage div.ope {
+            padding: 0 15px
+        }
+
+        ._nc.nc-h5-overlay .stage2 .textbox {
+            border: none;
+            border-radius: 0
+        }
+    </style>
+    <script type="text/javascript" charset="utf-8" async="" src="/static/js/0.7a35330c7626a789a6c7.js"></script>
+    <script type="text/javascript" charset="utf-8" async="" src="/static/js/326.82cb99a5e2c397ae9a8e.js"></script>
+    <script type="text/javascript" charset="utf-8" async="" src="/static/js/537.0ffab5bc63c2496f58e7.js"></script>
+    <script type="text/javascript" charset="utf-8" async="" src="/static/js/552.b0dccb0e1ae4a9ae09d3.js"></script>
+    <script charset="utf8" src="https://dlswbr.baidu.com/heicha/mw/abclite-2063-s.original.js?_=10025"></script>
+</head>
+<body>
+<div class="imgBox">
+    <img class="img-slide img1" src="/image/1.jpg" alt="1">
+    <img class="img-slide img2" src="/image/2.jpg" alt="2">
+    <img class="img-slide img3" src="/image/3.jpg" alt="3">
+    <img class="img-slide img4" src="/image/4.jpg" alt="4">
+    <img class="img-slide img5" src="/image/5.jpg" alt="5">
+    <img class="img-slide img6" src="/image/6.jpg" alt="6">
+    <img class="img-slide img7" src="/image/7.jpg" alt="7">
+</div>
+<div>
+    <img class="fangdajing" src="image/fangdajing.jpg"/>
+    <p style="margin-top: -26px;margin-left: 30px">查验结果</p>
+</div>
+
+<div class="figure-container">
+    <figure class="figure">
+        <div class="figure-text">正品</div>
+    </figure>
+</div>
+
+<div>
+    <p>您所查询的数码为：<strong class="strong-color">7737695058445134</strong></p>
+    <p>该防伪码已查询1次，您所查询的是恒源祥服饰系列的正品标识，感谢您的使用！</p>
+</div>
+
+<!--<footer style="background-color: white;">-->
+
+
+<!--    <div class="footer-button">-->
+
+<!--        <button id="button1">-->
+<!--            <img src="image/fangdajing.jpg" alt="Image 1">-->
+<!--            防伪查询-->
+<!--        </button>-->
+<!--    </div>-->
+<!--    <div class="footer-button">-->
+
+<!--        <button id="button2">-->
+<!--            <img src="image/huangguan.jpg" alt="Image 2">-->
+<!--            品牌故事-->
+<!--        </button>-->
+<!--    </div>-->
+
+<!--</footer>-->
+<div data-v-b7309138="" data-v-3d89a5f5=""
+     style="width: 100%; z-index: 99999; position: fixed; bottom: 0px;"><!---->
+    <div data-v-b7309138="" class="nav-item">
+        <div data-v-b7309138="" class="mint-navbar" xxxxxx="1"><a data-v-b7309138=""
+                                                                  class="mint-tab-item is-selected"
+                                                                  style="text-overflow: ellipsis; padding: 0px;">
+            <div class="mint-tab-item-icon"></div>
+            <div class="mint-tab-item-label">
+                <div data-v-b7309138="" style="padding: 6px 0px;">
+                    <div data-v-b7309138="" class="img-bg" style="background-color: rgb(44, 153, 207);"><img
+                            data-v-b7309138=""
+                            src="http://release-sup8-images.oss-cn-shanghai.aliyuncs.com/b13808645fc349eeaca55272b89d2215.png?Expires=253402271999&amp;OSSAccessKeyId=LTAIohjt8boJ8dHY&amp;Signature=RBFXJDVX7mCBMzwcseXdBGIh0WY%3D"
+                            alt=""></div>
+                    <div data-v-b7309138="" class="navbar-item" style="color: rgb(44, 153, 207);">
+                        防伪查询
+                    </div>
+                </div>
+            </div>
+        </a><a data-v-b7309138="" class="mint-tab-item" style="text-overflow: ellipsis; padding: 0px;">
+            <div class="mint-tab-item-icon"></div>
+            <div class="mint-tab-item-label">
+
+                <div data-v-b7309138="" style="padding: 6px 0px;">
+
+                    <div data-v-b7309138="" class="img-bg activebg"
+                         style="background-color: rgb(44, 153, 207);"><img data-v-b7309138=""
+                                                                           src="http://release-sup8-images.oss-cn-shanghai.aliyuncs.com/527a865e600948789b49b3f707672bdc.png?Expires=253402271999&amp;OSSAccessKeyId=LTAIohjt8boJ8dHY&amp;Signature=GriCYIIpZySsV0h3qllcmoHz6aI%3D"
+                                                                           alt=""></div>
+                    <div data-v-b7309138="" class="navbar-item activecolor"
+                         style="color: rgb(44, 153, 207);">
+                        品牌故事
+                    </div>
+                </div>
+            </div>
+        </a></div>
+    </div>
+</div>
+<script src="https://turing.captcha.qcloud.com/TCaptcha.js"></script>
+<script src="//res.supercarrier8.com/jquery/jquery.min.js"></script>
+<script src="//res.supercarrier8.com/lodash/4.17.11/lodash.min.js"></script>
+<script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=2.0&amp;ak=DAkHeza7GMvAuA5FL2p8GAZxC84WoMLh"></script>
+<script type="text/javascript"
+        src="https://api.map.baidu.com/getscript?v=2.0&amp;ak=DAkHeza7GMvAuA5FL2p8GAZxC84WoMLh&amp;services=&amp;t=20240731110958"></script>
+<script type="text/javascript" charset="utf-8" src="//g.alicdn.com/sd/nch5/index.js?t=2015052012"></script>
+<div id="tcaptcha_transform_dy"
+     style="opacity: 0; position: absolute; transition: opacity 0.3s linear 0s; top: -1e+06px;">
+    <iframe name="https://turing.captcha.qcloud.com" id="tcaptcha_iframe_dy" frameborder="0" border="0" marginheight="0"
+            marginwidth="0" scrolling="no" src="https://turing.captcha.gtimg.com/1/template/drag_ele.html"></iframe>
+</div>
+<script type="text/javascript">
+    var index = 0;
+
+    // 图片轮播效果
+    function ChangeImg() {
+        index++;
+        var a = document.getElementsByClassName("img-slide");
+        if (index >= a.length) index = 0;
+        for (var i = 0; i < a.length; i++) {
+            a[i].style.display = 'none';
+        }
+        a[index].style.display = 'block';
+    }
+    // 设置定时器，每隔两秒切换一张图片
+    setInterval(ChangeImg, 3000);
+
+</script>
+
+</html>
